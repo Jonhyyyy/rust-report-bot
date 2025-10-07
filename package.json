@@ -1,5 +1,5 @@
 {
-  "name": "rust-report-bot",
+  "name": "rust-report-bot-v2",
   "version": "1.0.0",
   "description": "Bot para crear canales de reportes desde Rust",
   "main": "bot.js",
