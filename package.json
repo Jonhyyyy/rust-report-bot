@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "discord.js": "^14.15.3",
-    "express": "^4.21.1",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.6.1",
+    "express": "^4.21.1"
   }
 }
