@@ -20,18 +20,24 @@ let linkData = JSON.parse(fs.readFileSync(linkDataPath, 'utf8'));
 const commands = [
     new SlashCommandBuilder()
         .setName('link')
-        .setDescription('Vincula tu cuenta de Rust con Discord'),
-];
+        .setDescription('Vincula tu cuenta de Rust con Discord')
+].map(cmd => cmd.toJSON());
+
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+
 (async () => {
     try {
         console.log('🔄 Registrando comando /link...');
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('✅ Comando /link registrado.');
+        await rest.put(
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
+            { body: commands }
+        );
+        console.log('✅ Comando /link registrado correctamente.');
     } catch (error) {
         console.error('❌ Error al registrar comando:', error);
     }
 })();
+
 
 // 🧩 Cuando un usuario use /link en Discord
 client.on('interactionCreate', async interaction => {
