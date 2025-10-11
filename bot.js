@@ -1,7 +1,8 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, PermissionsBitField, SlashCommandBuilder, REST, Routes } = require('discord.js');
 const fs = require('fs');
-const app = express();
+const express = require('express'); // ✅ Solo una vez
+const app = express();              // ✅ Solo una vez
 app.use(express.json());
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -15,7 +16,7 @@ const linkDataPath = './linkData.json';
 if (!fs.existsSync(linkDataPath)) fs.writeFileSync(linkDataPath, '{}');
 let linkData = JSON.parse(fs.readFileSync(linkDataPath, 'utf8'));
 
-// ✅ Registrar comando /link en Discord
+// ✅ Registrar comando /link
 const commands = [
     new SlashCommandBuilder()
         .setName('link')
@@ -37,8 +38,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     }
 })();
 
-
-// 🧩 Cuando un usuario use /link en Discord
+// 🧩 Eventos del bot
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand() || interaction.commandName !== 'link') return;
 
@@ -52,7 +52,7 @@ client.on('interactionCreate', async interaction => {
     });
 });
 
-// 📩 Endpoint para vincular desde Rust
+// 📩 Endpoints
 app.post('/link', (req, res) => {
     const { steamid, code } = req.body;
     if (!linkData[code]) return res.status(400).send('Código inválido o expirado.');
@@ -64,17 +64,14 @@ app.post('/link', (req, res) => {
     console.log(`✅ Jugador ${steamid} vinculado con Discord ${linkData[code].discord_id}`);
 });
 
-// 📩 Endpoint de reportes (actualizado para añadir al jugador)
 app.post('/report', async (req, res) => {
     const { username, userid, reason } = req.body;
     try {
         const guild = await client.guilds.fetch(GUILD_ID);
         const category = await guild.channels.fetch(CATEGORY_ID);
 
-        // Busca si el jugador está vinculado
         const linkedUser = Object.values(linkData).find(d => d.steamid === userid);
 
-        // Crea el canal privado
         const channel = await guild.channels.create({
             name: `reporte-${username}`.toLowerCase().replace(/[^a-z0-9\-]/g, ''),
             type: 0,
@@ -97,17 +94,12 @@ app.post('/report', async (req, res) => {
     }
 });
 
-const express = require('express');
-const app = express();
-
-// Healthcheck para Uptime Robot
+// ✅ Healthcheck para Uptime Robot
 app.get('/', (req, res) => res.send('Bot activo ✅'));
 
-// Escucha en el puerto asignado por Render
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor web activo en puerto ${PORT}`));
-
-
-client.once('clientReady', () => console.log(`✅ Bot listo como ${client.user.tag}`));
-client.login(process.env.DISCORD_TOKEN);
+// 🔌 Inicia servidor web
 app.listen(PORT, () => console.log(`🌐 API escuchando en puerto ${PORT}`));
+
+// 🔌 Inicia bot de Discord
+client.once('ready', () => console.log(`✅ Bot listo como ${client.user.tag}`));
+client.login(process.env.DISCORD_TOKEN);
