@@ -98,6 +98,17 @@ app.post('/report', async (req, res) => {
     }
 });
 
+const express = require('express');
+const app = express();
+
+// Healthcheck para Uptime Robot
+app.get('/', (req, res) => res.send('Bot activo ✅'));
+
+// Escucha en el puerto asignado por Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor web activo en puerto ${PORT}`));
+
+
 client.once('clientReady', () => console.log(`✅ Bot listo como ${client.user.tag}`));
 client.login(process.env.DISCORD_TOKEN);
 app.listen(PORT, () => console.log(`🌐 API escuchando en puerto ${PORT}`));
